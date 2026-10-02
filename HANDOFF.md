@@ -1,28 +1,32 @@
 # Maintenance notes — hermes-plugin-byterover
 
-This repository is the `byterover` memory provider that shipped inside `NousResearch/hermes-agent` under
-`plugins/memory/byterover/`. Nous Research moved every memory provider out of the core tree; this repo is
-now its home, **maintained by Nous Research** and listed in the
-[Hermes plugin catalog](https://hermes-agent.nousresearch.com/docs/plugins/byterover) as `byterover` (tier
-`official`), pinned to a reviewed release tag. If ByteRover (https://byterover.dev) wants to own the plugin, open an issue here: we transfer the repo or re-point the catalog entry at their fork, keeping the `byterover` name so existing users migrate.
+**Status: unmaintained, looking for an owner.** Nous Research does not maintain memory providers. This
+repository is a standalone copy of the `byterover` memory provider that ships inside `NousResearch/hermes-agent`
+under `plugins/memory/byterover/`, prepared so someone else can take it over. It is **not** listed in the
+Hermes plugin catalog and Nous publishes no further fixes or releases here. The last sync with core is
+tag `v1.0.2`.
+
+## Taking it over
+
+ByteRover (https://byterover.dev) — or anyone else — who wants to maintain this provider: open an issue in this repo. We can
+transfer the repository to you, or you can fork it. Once you maintain it, submit a catalog entry to
+`NousResearch/hermes-agent` (`plugin-catalog/byterover.yaml`, see the
+[plugin catalog guide](https://hermes-agent.nousresearch.com/docs/user-guide/features/plugin-catalog)) under the
+name `byterover`. That exact name matters: when core later drops its bundled copy, `hermes update` installs the
+catalog plugin of the same name for users who have `memory.provider: byterover`, keeping their config and data.
 
 ## Install (as a user)
 
-```
-hermes plugins install byterover     # from the catalog, at the reviewed pin
-hermes memory setup            # or: set memory.provider: byterover in config.yaml
-```
-
-Users who already had `memory.provider: byterover` need do nothing: once core drops its bundled copy,
-`hermes update` (and agent start) installs this plugin from the catalog automatically. Config
-(`memory.byterover` / plugin sections) and data files are unchanged. The only external requirement is the `brv` CLI
-(see README); nothing is installed into the Hermes venv.
+Nothing to do: Hermes Agent still bundles this provider (`hermes memory setup`, or
+`memory.provider: byterover` in config.yaml). To try this standalone copy instead, `hermes plugins install
+NousResearch/hermes-plugin-byterover --ref a3876250252afb098ffc038d6194b0ebfb364b9c` (tag `v1.0.2`); the bundled copy wins on name while it exists.
+From a non-catalog source the install scanner blocks it with a `caution` verdict (the `curl … | sh`
+`brv` install hint and the `brv` subprocess calls); review the findings, then add `--force`.
 
 ## Keeping it in sync with core
 
 Code here tracks the last in-tree copy (`git log -- plugins/memory/byterover` in hermes-agent) verbatim.
-Every release is a tag `vX.Y.Z` matching `version` in `plugin.yaml`; the catalog
-pin moves only through a hermes-agent PR that bumps `sha:` and `version:` together.
+Every release is a tag `vX.Y.Z` matching `version` in `plugin.yaml`. A future catalog entry would pin a tag by `sha:` and `version:`.
 
 Differences versus the in-tree copy (mechanical only; behaviour is identical):
 
