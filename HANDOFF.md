@@ -15,26 +15,25 @@ hermes memory setup            # or: set memory.provider: byterover in config.ya
 
 Users who already had `memory.provider: byterover` need do nothing: once core drops its bundled copy,
 `hermes update` (and agent start) installs this plugin from the catalog automatically. Config
-(`memory.byterover` / plugin sections) and data files are unchanged. Dependencies in `pyproject.toml` are
-installed into the Hermes venv automatically and survive `hermes update`.
+(`memory.byterover` / plugin sections) and data files are unchanged. The only external requirement is the `brv` CLI
+(see README); nothing is installed into the Hermes venv.
 
 ## Keeping it in sync with core
 
 Code here tracks the last in-tree copy (`git log -- plugins/memory/byterover` in hermes-agent) verbatim.
-Every release is a tag `vX.Y.Z` matching `version` in `plugin.yaml` and `pyproject.toml`; the catalog
+Every release is a tag `vX.Y.Z` matching `version` in `plugin.yaml`; the catalog
 pin moves only through a hermes-agent PR that bumps `sha:` and `version:` together.
 
 Differences versus the in-tree copy (mechanical only; behaviour is identical):
 
 - Self-imports are relative so the package loads from `~/.hermes/plugins/byterover/` under the loader's
   synthetic namespace.
-- `pyproject.toml` is the dependency authority (no `tools.lazy_deps` calls).
+- No `pyproject.toml`: the provider has no Python dependencies, and an empty `pyproject.toml` still
+  makes Hermes ask for dependency consent at install, which an unattended migration (agent start,
+  gateway) cannot answer. Add one only together with a real dependency.
 
 ## For maintainers
 
-- The in-tree `tools.lazy_deps.ensure("memory.byterover")` calls were removed: they pinned the exact
-  (old) version in Hermes' lazy-deps registry and downgraded newer installs (hermes-agent#86992).
-  `pyproject.toml` is now the only dependency authority; bump it when you need a newer client.
 - `tests/` holds the in-tree tests (`tests/plugins/memory/test_byterover*.py` in hermes-agent) with the
   import path switched to the package `tests/conftest.py` loads from this repo. Run them locally with
   `HERMES_AGENT_REPO=~/.hermes/hermes-agent PYTHONPATH=~/.hermes/hermes-agent python -m pytest -q`;

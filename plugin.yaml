@@ -1,5 +1,5 @@
 name: byterover
-version: 1.0.1
+version: 1.0.2
 description: "ByteRover — persistent knowledge tree with tiered retrieval via the brv CLI."
 external_dependencies:
   - name: brv

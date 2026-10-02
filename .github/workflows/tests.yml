@@ -32,12 +32,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-      - name: Install hermes-agent and this plugin's declared dependencies
-        shell: bash
-        run: |
-          python -m pip install -e ./hermes-agent "pytest==9.1.1"
-          python -c "import tomllib; print('\n'.join(tomllib.load(open('plugin/pyproject.toml', 'rb'))['project']['dependencies']))" > plugin-deps.txt
-          python -m pip install -r plugin-deps.txt
+      # No Python dependencies (no pyproject.toml on purpose; see HANDOFF.md).
+      - name: Install hermes-agent
+        run: python -m pip install -e ./hermes-agent "pytest==9.1.1"
       - name: Run the plugin suite
         working-directory: plugin
         env:
