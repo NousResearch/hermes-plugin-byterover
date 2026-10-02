@@ -1,6 +1,6 @@
 [project]
 name = "hermes-plugin-byterover"
-version = "1.0.0"
+version = "1.0.1"
 description = "Hermes Agent memory provider plugin: byterover"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -9,3 +9,6 @@ license = { text = "MIT" }
 # and refuses a plugin whose requirements cannot resolve against them.
 dependencies = [
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

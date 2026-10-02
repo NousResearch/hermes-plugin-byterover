@@ -1,4 +1,4 @@
-> **Handoff repository.** This is the standalone copy of the `byterover` memory provider formerly bundled with Hermes Agent, published so its upstream maintainers can take it over. Not an official Nous Research plugin. See [HANDOFF.md](HANDOFF.md).
+> **Maintained by Nous Research.** This is the `byterover` memory provider that used to ship inside Hermes Agent under `plugins/memory/byterover/`; it now installs from the [Hermes plugin catalog](https://hermes-agent.nousresearch.com/docs/plugins/byterover). Existing `memory.provider: byterover` setups keep their config and data. See [HANDOFF.md](HANDOFF.md).
 
 # ByteRover Memory Provider
 

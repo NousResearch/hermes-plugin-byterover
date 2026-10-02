@@ -1,46 +1,45 @@
-# Handoff notes — hermes-plugin-byterover
+# Maintenance notes — hermes-plugin-byterover
 
-This repository is a **handoff copy** of the `byterover` memory provider that shipped inside
-`NousResearch/hermes-agent` under `plugins/memory/byterover/`. Nous Research is moving every memory
-provider out of the core tree; this repo exists so the upstream project (https://byterover.dev)
-can clone it, take ownership, and submit it to the [Hermes plugin catalog](https://hermes-agent.nousresearch.com/plugins)
-under their own org. It is **not** an officially maintained Nous plugin.
-
-What it is: ByteRover memory via the `brv` CLI.
+This repository is the `byterover` memory provider that shipped inside `NousResearch/hermes-agent` under
+`plugins/memory/byterover/`. Nous Research moved every memory provider out of the core tree; this repo is
+now its home, **maintained by Nous Research** and listed in the
+[Hermes plugin catalog](https://hermes-agent.nousresearch.com/docs/plugins/byterover) as `byterover` (tier
+`official`), pinned to a reviewed release tag. If ByteRover (https://byterover.dev) wants to own the plugin, open an issue here: we transfer the repo or re-point the catalog entry at their fork, keeping the `byterover` name so existing users migrate.
 
 ## Install (as a user)
 
 ```
-hermes plugins install NousResearch/hermes-plugin-byterover
-hermes plugins enable byterover
+hermes plugins install byterover     # from the catalog, at the reviewed pin
 hermes memory setup            # or: set memory.provider: byterover in config.yaml
 ```
 
-Dependencies in `pyproject.toml` are installed into the Hermes venv automatically and survive
-`hermes update`.
+Users who already had `memory.provider: byterover` need do nothing: once core drops its bundled copy,
+`hermes update` (and agent start) installs this plugin from the catalog automatically. Config
+(`memory.byterover` / plugin sections) and data files are unchanged. Dependencies in `pyproject.toml` are
+installed into the Hermes venv automatically and survive `hermes update`.
 
-## What changed versus the in-tree copy
+## Keeping it in sync with core
 
-Mechanical only; behaviour is identical.
+Code here tracks the last in-tree copy (`git log -- plugins/memory/byterover` in hermes-agent) verbatim.
+Every release is a tag `vX.Y.Z` matching `version` in `plugin.yaml` and `pyproject.toml`; the catalog
+pin moves only through a hermes-agent PR that bumps `sha:` and `version:` together.
 
-- Absolute self-imports (`from plugins.memory.byterover.x import ...`) became relative imports so the
-  package loads from `~/.hermes/plugins/byterover/` under the loader's synthetic namespace.
-- No shared helpers needed.
-- Added `pyproject.toml` declaring: nothing (no third-party Python packages).
+Differences versus the in-tree copy (mechanical only; behaviour is identical):
 
-## For the maintainer taking this over
+- Self-imports are relative so the package loads from `~/.hermes/plugins/byterover/` under the loader's
+  synthetic namespace.
+- `pyproject.toml` is the dependency authority (no `tools.lazy_deps` calls).
 
-- `config_schema.py` still imports from `plugins.memory.config_schema`: Hermes core loads that file
-  directly and the dashboard expects core's `ProviderConfigSchema` type, so it must not be vendored.
+## For maintainers
+
 - The in-tree `tools.lazy_deps.ensure("memory.byterover")` calls were removed: they pinned the exact
   (old) version in Hermes' lazy-deps registry and downgraded newer installs (hermes-agent#86992).
   `pyproject.toml` is now the only dependency authority; bump it when you need a newer client.
-- The setup wizard imports private helpers from `hermes_cli.memory_setup` (`_curses_select`,
-  `_prompt`, ...). Those are Hermes internals, not API; expect to own a copy or drop the wizard
-  hook if they move.
-- Tests were not copied: the in-tree tests import `plugins.memory.byterover` and depend on the
-  hermes-agent test harness. See `tests/plugins/memory/` in hermes-agent for the originals.
-- While the in-tree copy still exists, a same-named user plugin is shadowed by it
-  (bundled providers win on name). It takes effect the moment core drops `plugins/memory/byterover`.
+- `tests/` holds the in-tree tests (`tests/plugins/memory/test_byterover*.py` in hermes-agent) with the
+  import path switched to the package `tests/conftest.py` loads from this repo. Run them locally with
+  `HERMES_AGENT_REPO=~/.hermes/hermes-agent PYTHONPATH=~/.hermes/hermes-agent python -m pytest -q`;
+  CI runs the same on Linux, macOS and Windows against hermes-agent `main`.
+- While a Hermes install still carries the bundled `plugins/memory/byterover`, that copy wins on name and
+  this plugin is dormant; it takes over once core drops the bundled directory.
 
 Original authors are preserved in hermes-agent's history: `git log -- plugins/memory/byterover`.
